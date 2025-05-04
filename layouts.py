@@ -16,8 +16,8 @@ class LayOuts:
 
 
         # if pos == "left" or  pos == "right":
-        self.main_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        parent.add(self.main_box)
+        # self.main_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        # parent.add(self.main_box)
         
         # self.left_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         # self.middle_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
@@ -92,7 +92,6 @@ class LayOuts:
 
 
     def bottom_position(self, parent, width_gap, height_gap):
-        GtkLayerShell.init_for_window(parent)
         GtkLayerShell.set_layer(parent, GtkLayerShell.Layer.BOTTOM)
         GtkLayerShell.set_anchor(parent, GtkLayerShell.Edge.BOTTOM, True)
         GtkLayerShell.auto_exclusive_zone_enable(parent)
