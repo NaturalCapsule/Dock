@@ -4,9 +4,10 @@ gi.require_version('Gdk', '3.0')
 gi.require_version('GtkLayerShell', '0.1')
 
 from gi.repository import Gtk, Gdk, GtkLayerShell
-from get_screen import screen
+from config import *
 from layouts import LayOuts
-
+from load_apps import load
+from load_css import load_css_
 
 class Dock(Gtk.Window):
     def __init__(self):
@@ -18,26 +19,33 @@ class Dock(Gtk.Window):
         self.set_keep_above(True)
         self.set_resizable(False)
         self.set_hexpand(True)
+        self.set_vexpand(False)
         self.get_style_context().add_class('Window')
         self.set_type_hint(Gdk.WindowTypeHint.DOCK)
         self.layouts()
         self.setupUI()
         # self.test()
-        
-        
+        load(self.main_box)
         
         
         self.show_all()
 
     def layouts(self):
+        pos = get_position()
         self.layouts_ = LayOuts(self)
-        
-        self.set_default_size(50, 50)
-        self.layouts_.bottom_position(parent=self, width_gap=10, height_gap=10)
+        self.set_default_size(100, 50)
+        if pos == 'bottom':
+            self.layouts_.bottom_position(parent=self, height_gap=10)
+        elif pos == 'left':
+            self.layouts_.left_position(self, 10, 10, 10)
+        elif pos == 'right':
+            self.layouts_.right_position(self, 10, 10, 10)
+        else:
+            self.layouts_.top_position(self, 10)
 
 
     def setupUI(self):
-        self.set_size_request(100, 50)
+        self.set_size_request(50, 50)
         self.main_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         self.add(self.main_box)
 
@@ -51,17 +59,7 @@ class Dock(Gtk.Window):
         self.main_box.pack_start(button, False, False, 0)
 
 
-
-css_provider = Gtk.CssProvider()
-with open ('config/style.css', 'r') as f:
-    css = f.read()
-css_provider.load_from_data(css.encode())
-
-Gtk.StyleContext.add_provider_for_screen(
-    Gdk.Screen.get_default(),
-    css_provider,
-    Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
-)
+load_css_()
 
 dock = Dock()
 dock.connect("destroy", Gtk.main_quit)

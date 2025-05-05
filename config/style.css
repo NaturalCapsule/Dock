@@ -1,8 +1,78 @@
-.Window {
-    background-color: black;
-    border-radius: 20px;
+button {
+    all: unset;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    outline: none;
+    padding: 0;
+    margin: 0;
+    color: inherit;
 }
 
-.Button {
-    background-color: white;
+button:hover,
+button:focus,
+button:active {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    outline: none;
+}
+
+button * {
+    all: unset;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    outline: none;
+    margin: 0px;
+    padding: 0px;
+}
+
+* {
+    all: unset;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    outline: none;
+    margin: 0px;
+    padding: 0px;
+}
+
+/*--------------------------Don't Change Above!--------------------------*/
+
+/* .Window {
+    background-color: black;
+    border-radius: 20px;
+} */
+
+
+.App-Button {
+    border-radius: 12px;
+    background-color: transparent;
+    border: 2px solid #0ff;
+    padding: 10px;
+    margin: 5px;
+    color: white;
+    box-shadow: inset 0 0 10px #0ff, 0 0 10px #0ff;
+    font-weight: bold;
+    transition: all 0.3s ease-in-out;
+    /* -webkit-mask-image: radial-gradient(white, black); helps in some edge cases */
+    -webkit-border-radius: 12px;
+    
+}
+
+.App-Button:hover {
+    background-color: #00f;
+    border-color: #fff;
+    margin: 5px;
+    box-shadow: inset 0 0 20px #fff, 0 0 20px #fff;
+    outline: 3px solid #ff0;
+    border: 2px solid #0ff;
+    padding: 10px;
+}
+
+.App-Button:active {
+    background-color: #f00;
+    box-shadow: inset 0 0 30px #f00, 0 0 60px #f00;
+    border-color: #ff0;
 }
