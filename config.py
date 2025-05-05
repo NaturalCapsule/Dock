@@ -6,7 +6,8 @@ config = ConfigParser()
 
 config.read('config/config.ini')
 
-apps_info = {}
+# apps_info = {}
+apps_info = []
 
 def clean_exec(exec_cmd):
     return re.sub(r"\s*%[a-zA-Z]", "", exec_cmd).strip()
@@ -17,17 +18,21 @@ def get_apps():
             try:
                 config_ = ConfigParser(interpolation=None)
                 config_.read(value)
-                
+                name = config_.get('Desktop Entry', 'Name')
                 exec_command = config_.get('Desktop Entry', 'Exec')
                 icon = config_.get('Desktop Entry', 'icon')
                 
                 clean_exec_ = clean_exec(exec_command)
                 
-                apps_info[icon] = clean_exec_
-            
+                # apps_info[icon] = clean_exec_, name
+                if name and exec_command:
+                    apps_info.append((icon, clean_exec_, name))
+                # print(apps_info)
             except ValueError:
                 print(f"Invalid entry for {key} in config.ini. Expected format: app_path")
         return apps_info
+
+# get_apps()
 
 def get_position():
     pos = config.get('Appearance', 'Position')

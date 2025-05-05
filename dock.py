@@ -14,7 +14,6 @@ class Dock(Gtk.Window):
         super().__init__()
 
         GtkLayerShell.init_for_window(self)
-
         self.set_decorated(False)
         self.set_keep_above(True)
         self.set_resizable(False)

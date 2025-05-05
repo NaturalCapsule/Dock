@@ -56,7 +56,7 @@ button * {
     box-shadow: inset 0 0 10px #0ff, 0 0 10px #0ff;
     font-weight: bold;
     transition: all 0.3s ease-in-out;
-    /* -webkit-mask-image: radial-gradient(white, black); helps in some edge cases */
+    -webkit-mask-image: radial-gradient(white, black);
     -webkit-border-radius: 12px;
     
 }
