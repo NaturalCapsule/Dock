@@ -14,16 +14,9 @@ class Dock(Gtk.Window):
         super().__init__()
 
         GtkLayerShell.init_for_window(self)
-        self.set_decorated(False)
-        self.set_keep_above(True)
-        self.set_resizable(False)
-        self.set_hexpand(True)
-        self.set_vexpand(False)
-        self.get_style_context().add_class('Window')
-        self.set_type_hint(Gdk.WindowTypeHint.DOCK)
+
         self.layouts()
         self.setupUI()
-        # self.test()
         load(self.main_box)
         
         
@@ -44,19 +37,17 @@ class Dock(Gtk.Window):
 
 
     def setupUI(self):
+        self.set_decorated(False)
+        self.set_keep_above(True)
+        self.set_resizable(False)
+        self.set_hexpand(True)
+        self.set_vexpand(False)
+        self.get_style_context().add_class('Window')
+        self.set_type_hint(Gdk.WindowTypeHint.DOCK)
+        
         self.set_size_request(50, 50)
         self.main_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         self.add(self.main_box)
-
-
-    def test(self):
-        button = Gtk.Button()
-        
-        image = Gtk.Image.new_from_icon_name('kitty', Gtk.IconSize.SMALL_TOOLBAR)
-        button.set_image(image)
-        
-        self.main_box.pack_start(button, False, False, 0)
-
 
 load_css_()
 

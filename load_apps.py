@@ -6,7 +6,7 @@ import json
 
 gi.require_version('Gtk', '3.0')
 
-from gi.repository import Gtk, GdkPixbuf
+from gi.repository import Gtk, GdkPixbuf, GLib
 from config import get_apps
 from load_css import load_css_
 from collections import defaultdict
@@ -28,15 +28,12 @@ def list_apps_by_workspace():
             if app == 'Visual Studio Code':
                 app = 'Code'
             workspace_apps[app] = ws_id
-            # print(workspace_apps)
-        # print()
+
 
 def open_app(widget, exec, name):
     check = subprocess.run("hyprctl clients | grep -E 'workspace|class'", 
                            shell=True, capture_output=True, text=True)
 
-    if name == 'Visual Studio Code':
-        name = 'Code'
 
     if name in check.stdout.strip():
         list_apps_by_workspace()
@@ -60,29 +57,55 @@ def load(main_box):
         button.set_size_request(48, 48)
         button.get_style_context().add_class('App-Button')
 
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
 
         pixbuf = Gtk.IconTheme.get_default().load_icon(icon, 32, 0)
         scaled_pixbuf = pixbuf.scale_simple(20, 20, GdkPixbuf.InterpType.BILINEAR)
         image = Gtk.Image.new_from_pixbuf(scaled_pixbuf)
-        button.set_image(image)
+
+
+        dot_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
+        dot_box.set_halign(Gtk.Align.CENTER)
+
+
+        if name == 'Visual Studio Code':
+            name = 'Code'
+        # count_windows(name, dot_box, button)
+        
+        vbox.pack_start(image, False, False, 0)
+        vbox.pack_start(dot_box, False, False, 0)
+
+        button.add(vbox)
 
         button.connect('clicked', open_app, exec_cmd, name)
-        main_box.pack_start(button, False, False, 2)
+        main_box.pack_start(button, False, False, 0)
+        GLib.timeout_add(250, count_windows, name, dot_box, button)
 
 
 
-def list_apps_by_workspace():
-    result = subprocess.run(["hyprctl", "-j", "clients"], capture_output=True, text=True)
+def count_windows(app, dot_box, button):
+    result = subprocess.run(['hyprctl', 'clients', '-j'], stdout=subprocess.PIPE, text=True)
     clients = json.loads(result.stdout)
+    windows = [c for c in clients if c['class'] == app]
+    len_window = int(len(windows))
 
-    workspaces = defaultdict(list)
-    for client in clients:
-        workspace_id = client["workspace"]["id"]
-        app_name = client["class"]
-        workspaces[workspace_id].append(app_name)
 
-    for ws_id in sorted(workspaces):
-        for app in workspaces[ws_id]:
-            if app == 'Visual Studio Code':
-                app = 'Code'
-            workspace_apps[app] = ws_id
+    for child in dot_box.get_children():
+        dot_box.remove(child)
+
+    if len_window > 0:
+        button.get_style_context().remove_class('App-Button')
+        button.get_style_context().add_class('Active-Apps')
+
+        for count in range(len_window):
+            dot = Gtk.Label(label='')
+            dot.set_size_request(1, 1)
+            dot.get_style_context().add_class('Dot')
+            dot_box.pack_start(dot, False, False, 0)
+
+        dot_box.show_all()
+    else:
+        button.get_style_context().remove_class('Active-Apps')
+        button.get_style_context().add_class('App-Button')
+
+    return True
