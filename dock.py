@@ -42,11 +42,17 @@ class Dock(Gtk.Window):
         self.set_resizable(False)
         self.set_hexpand(True)
         self.set_vexpand(False)
-        self.get_style_context().add_class('Window')
+        self.get_style_context().add_class('Dock')
         self.set_type_hint(Gdk.WindowTypeHint.DOCK)
         
         self.set_size_request(50, 50)
-        self.main_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        pos = get_position()
+        if pos == 'bottom' or pos == 'top':
+            self.main_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        elif pos == 'left' or pos == 'right':
+            self.main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+
+        # 
         self.add(self.main_box)
 
 load_css_()

@@ -4,7 +4,7 @@ gi.require_version('Gtk', '3.0')
 gi.require_version("GtkLayerShell", "0.1")
 
 from gi.repository import Gtk, GtkLayerShell
-
+from configparser import ConfigParser
 
 
 class LayOuts:
@@ -15,36 +15,7 @@ class LayOuts:
             exit(0)
 
 
-        # if pos == "left" or  pos == "right":
-        # self.main_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        # parent.add(self.main_box)
-        
-        # self.left_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        # self.middle_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        # self.right_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        # elif pos == "top" or pos == "bottom":
-        #     main_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        #     parent.add(main_box)
-
-        #     self.left_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        #     self.middle_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        #     self.right_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-
-        #     self.left_spacer = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        #     self.right_spacer = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-
-
-
-        # main_box.pack_start(self.left_box, False, False, 0)
-        # main_box.pack_start(self.middle_box, False, False, 0)
-        # main_box.pack_start(self.right_box, False, False, 0)
-
-        # self.middle_box.set_halign(Gtk.Align.CENTER)
-
-
-
     def left_position(self, parent, width_gap, desired_width, height_gap):
-        # GtkLayerShell.init_for_window(parent)
         GtkLayerShell.set_layer(parent, GtkLayerShell.Layer.TOP)
 
         GtkLayerShell.set_anchor(parent, GtkLayerShell.Edge.LEFT, True)
