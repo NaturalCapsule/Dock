@@ -7,7 +7,7 @@ import json
 gi.require_version('Gtk', '3.0')
 
 from gi.repository import Gtk, GdkPixbuf, GLib
-from config import get_apps
+from config import *
 from load_css import load_css_
 from collections import defaultdict
 
@@ -34,10 +34,11 @@ def open_app(widget, exec, name):
     check = subprocess.run("hyprctl clients | grep -E 'workspace|class'", 
                            shell=True, capture_output=True, text=True)
 
-
-    if name in check.stdout.strip():
-        list_apps_by_workspace()
-        subprocess.Popen(['hyprctl', 'dispatch', 'workspace', str(workspace_apps.get(name))])
+    swicther = get_switcher()
+    if swicther:
+        if name in check.stdout.strip():
+            list_apps_by_workspace()
+            subprocess.Popen(['hyprctl', 'dispatch', 'workspace', str(workspace_apps.get(name))])
 
 
     else:
@@ -50,36 +51,37 @@ def open_app(widget, exec, name):
 def load(main_box):
     load_css_()
     
-    app = get_apps()
-    for icon, exec_cmd, name in app:
+    app = get_apps(Gtk)
+    for name, exec_cmd, icon in app:
+        if name == 'Separator' and icon == None:
+            main_box.pack_start(exec_cmd, False, False, 0)
+        else:
+            button = Gtk.Button()
+            button.set_size_request(48, 48)
+            button.get_style_context().add_class('App-Button')
 
-        button = Gtk.Button()
-        button.set_size_request(48, 48)
-        button.get_style_context().add_class('App-Button')
+            vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
 
-        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
-
-        pixbuf = Gtk.IconTheme.get_default().load_icon(icon, 32, 0)
-        scaled_pixbuf = pixbuf.scale_simple(20, 20, GdkPixbuf.InterpType.BILINEAR)
-        image = Gtk.Image.new_from_pixbuf(scaled_pixbuf)
-
-
-        dot_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
-        dot_box.set_halign(Gtk.Align.CENTER)
+            pixbuf = Gtk.IconTheme.get_default().load_icon(icon, 32, 0)
+            scaled_pixbuf = pixbuf.scale_simple(20, 20, GdkPixbuf.InterpType.BILINEAR)
+            image = Gtk.Image.new_from_pixbuf(scaled_pixbuf)
 
 
-        if name == 'Visual Studio Code':
-            name = 'Code'
-        # count_windows(name, dot_box, button)
-        
-        vbox.pack_start(image, False, False, 0)
-        vbox.pack_start(dot_box, False, False, 0)
+            dot_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
+            dot_box.set_halign(Gtk.Align.CENTER)
 
-        button.add(vbox)
 
-        button.connect('clicked', open_app, exec_cmd, name)
-        main_box.pack_start(button, False, False, 0)
-        GLib.timeout_add(250, count_windows, name, dot_box, button)
+            if name == 'Visual Studio Code':
+                name = 'Code'
+            
+            vbox.pack_start(image, False, False, 0)
+            vbox.pack_start(dot_box, False, False, 0)
+
+            button.add(vbox)
+
+            button.connect('clicked', open_app, exec_cmd, name)
+            main_box.pack_start(button, False, False, 0)
+            GLib.timeout_add(250, count_windows, name, dot_box, button)
 
 
 

@@ -45,6 +45,15 @@ button * {
     border-radius: 20px;
 }
 
+.Separators {
+    background-color: white;
+    border-radius: 1px;
+    min-width: 2px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    min-height: 30px;  /* Adjust as needed */
+}
+
 .Dot {
     color: #00ccff;
     font-size: 9px;

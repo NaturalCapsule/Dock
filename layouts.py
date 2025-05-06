@@ -4,7 +4,6 @@ gi.require_version('Gtk', '3.0')
 gi.require_version("GtkLayerShell", "0.1")
 
 from gi.repository import Gtk, GtkLayerShell
-from configparser import ConfigParser
 
 
 class LayOuts:

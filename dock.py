@@ -52,7 +52,6 @@ class Dock(Gtk.Window):
         elif pos == 'left' or pos == 'right':
             self.main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 
-        # 
         self.add(self.main_box)
 
 load_css_()
