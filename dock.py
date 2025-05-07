@@ -100,11 +100,6 @@ class Dock(Gtk.Window):
         self.main_box.pack_start(self.media_image, False, False, 0)
         self.main_box.pack_start(vbox, False, False, 0)
 
-    def on_key_press(self, widget, event):
-        if event.keyval == Gdk.KEY_space:
-            # self.label.set_text("Spacebar was pressed!")
-            print("Spacebar pressed")
-
 load_css_()
 
 dock = Dock()
