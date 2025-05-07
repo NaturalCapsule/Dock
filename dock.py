@@ -59,7 +59,6 @@ class Dock(Gtk.Window):
         elif pos == 'left' or pos == 'right':
             self.main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 
-        self.connect('key-press-event', self.on_key_press)
         # self.set_focus(self)
 
         self.add(self.main_box)
