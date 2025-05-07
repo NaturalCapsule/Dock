@@ -59,6 +59,9 @@ class Dock(Gtk.Window):
         elif pos == 'left' or pos == 'right':
             self.main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 
+        self.connect('key-press-event', self.on_key_press)
+        # self.set_focus(self)
+
         self.add(self.main_box)
 
     def media_(self):
@@ -96,6 +99,11 @@ class Dock(Gtk.Window):
 
         self.main_box.pack_start(self.media_image, False, False, 0)
         self.main_box.pack_start(vbox, False, False, 0)
+
+    def on_key_press(self, widget, event):
+        if event.keyval == Gdk.KEY_space:
+            # self.label.set_text("Spacebar was pressed!")
+            print("Spacebar pressed")
 
 load_css_()
 

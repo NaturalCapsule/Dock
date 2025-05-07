@@ -66,3 +66,4 @@ class LayOuts:
         GtkLayerShell.set_anchor(parent, GtkLayerShell.Edge.BOTTOM, True)
         GtkLayerShell.auto_exclusive_zone_enable(parent)
         GtkLayerShell.set_margin(parent, GtkLayerShell.Edge.BOTTOM, height_gap)
+        # GtkLayerShell.set_keyboard_interactivity(parent, True)  # Important!
