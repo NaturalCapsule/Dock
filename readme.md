@@ -1,9 +1,9 @@
 ## 📦 Installation
 
 make sure these packages are installed on your system
-`sudo pacman -S python-gobject gtk3`
+`sudo pacman -S python-gobject gtk3 playerctl`
 and
-`pip install pyGObject cairo configparser`
+`pip install pyGObject cairo configparser python-dbus`
 
 1. **Clone the repo**
    ```bash
