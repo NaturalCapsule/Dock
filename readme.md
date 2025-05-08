@@ -1,7 +1,7 @@
 ## 📦 Installation
 
 make sure these packages are installed on your system
-`sudo pacman -S python-gobject gtk3 playerctl`
+`sudo pacman -S python-gobject gtk3 playerctl gtk-layer-shell`
 and
 `pip install pyGObject pycairo configparser dbus-python`
 
