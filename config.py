@@ -1,8 +1,9 @@
 import re
-from configparser import ConfigParser
+import configparser
+# from configparser import ConfigParser
 
 
-config = ConfigParser()
+config = configparser.ConfigParser()
 
 config.read('config/config.ini')
 
@@ -23,14 +24,16 @@ def get_apps(Gtk):
                     apps_info.append(('Separator', separator, None))
                     
                 else:
-                    config_ = ConfigParser(interpolation=None)
+                    config_ = configparser.ConfigParser(interpolation=None)
                     config_.read(value)
-                    name = config_.get('Desktop Entry', 'Name')
-                    exec_command = config_.get('Desktop Entry', 'Exec')
-                    icon = config_.get('Desktop Entry', 'icon')
-                    
-                    clean_exec_ = clean_exec(exec_command)
-                    
+                    try:
+                        name = config_.get('Desktop Entry', 'Name')
+                        exec_command = config_.get('Desktop Entry', 'Exec')
+                        icon = config_.get('Desktop Entry', 'icon')
+                        
+                        clean_exec_ = clean_exec(exec_command)
+                    except configparser.NoSectionError:
+                        print("Error: Invalid file type, The file need to be has these inside:\n[Desktop Entry]\nName=(Name of the application)\nExec=(Execute command)\nicon=(icon)\n\nPlease try again")
                     # apps_info[icon] = clean_exec_, name
                     if name and exec_command:
                         apps_info.append((name, clean_exec_, icon))

@@ -59,6 +59,7 @@ button * {
     font-size: 9px;
     margin: 0;
     padding: 0;
+    transition: all 0.2s ease;
 }
 
 .Play-Pause {
@@ -104,6 +105,8 @@ button * {
 
 .Active-Apps:hover {
     background-color: #302d41;
+    transition: all 0.2s ease;
+
 }
 
 .App-Button {
