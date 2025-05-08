@@ -3,7 +3,7 @@
 make sure these packages are installed on your system
 `sudo pacman -S python-gobject gtk3 playerctl`
 and
-`pip install pyGObject cairo configparser python-dbus`
+`pip install pyGObject pycairo configparser dbus-python`
 
 1. **Clone the repo**
    ```bash

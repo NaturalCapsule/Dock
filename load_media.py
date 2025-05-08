@@ -9,6 +9,7 @@ gi.require_version('Gdk', '3.0')
 
 from gi.repository import GLib, Gdk, GdkPixbuf
 from media import MediaPlayerMonitor
+from config import thumbnail_size
 import cairo
 
 media = MediaPlayerMonitor()
@@ -98,10 +99,10 @@ def update_media(label, image):
                 
                 safe_set_label(label, current_title)
                 
-                height, width = 90, 90
+                # height, width = 90, 90
                 if 'file:///' in media.art_url:
                     thumbnail = media.art_url.replace('file:///', '/')
-                    height, width = 90, 90
+                    # height, width = 90, 90
                 elif 'https://' in media.art_url or 'http://' in media.art_url:
                     thumbnail = get_cached_filename(current_title)
                     if not os.path.exists(thumbnail):
@@ -109,10 +110,11 @@ def update_media(label, image):
                         urllib.request.urlretrieve(media.art_url, thumbnail)
                     else:
                         print(f"Using cached thumbnail: {thumbnail}")
-                    height, width = 55, 70
+                    # height, width = 55, 70
 
                 if thumbnail and os.path.exists(thumbnail):
-                    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(thumbnail, width, height)
+                    x, y = thumbnail_size()
+                    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(thumbnail, x, y)
                     radius_pixbuf = create_radius_pixbuf(pixbuf)
 
                     print("Setting images safely...")

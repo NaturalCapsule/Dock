@@ -59,8 +59,6 @@ class Dock(Gtk.Window):
         elif pos == 'left' or pos == 'right':
             self.main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 
-        # self.set_focus(self)
-
         self.add(self.main_box)
 
     def media_(self):
@@ -84,20 +82,27 @@ class Dock(Gtk.Window):
         self.backward.get_style_context().add_class('Backward')
 
 
-        hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-        hbox.set_halign(Gtk.Align.CENTER)
-        hbox.pack_start(self.backward, False, False, 0)
-        hbox.pack_start(self.play_pause, False, False, 0)
-        hbox.pack_start(self.forward, False, False, 0)
-
+        show = show_media_buttons()
+        if show:
+            hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+            hbox.set_halign(Gtk.Align.CENTER)
+            hbox.pack_start(self.backward, False, False, 0)
+            hbox.pack_start(self.play_pause, False, False, 0)
+            hbox.pack_start(self.forward, False, False, 0)
+        
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=5)
         vbox.set_halign(Gtk.Align.CENTER)
         
-        vbox.pack_start(self.media_label, False, False, 0)
-        vbox.pack_start(hbox, False, False, 0)
+        if show:
+            vbox.pack_start(self.media_label, False, False, 0)
+            vbox.pack_start(hbox, False, False, 0)
 
         self.main_box.pack_start(self.media_image, False, False, 0)
-        self.main_box.pack_start(vbox, False, False, 0)
+        if show:
+            self.main_box.pack_start(vbox, False, False, 0)
+        else:
+            self.main_box.pack_start(self.media_label, False, False, 0)
+
 
 load_css_()
 
