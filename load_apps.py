@@ -77,6 +77,8 @@ def open_app(widget, exec, name):
         # for c in clients:
         #     if c['class'] == name or name in c['class'] or c['class'] in name or c['initialTitle'] == name or c['initialTitle'] in name or name in c['initialTitle']:
             
+        term = config.get('Options', 'Terminal')
+
         # if name in check.stdout.strip() or check.stdout.strip() in name:
         check = check_names(name)
         if check:
@@ -87,14 +89,14 @@ def open_app(widget, exec, name):
 
         else:
             if exec =='htop' or exec == 'yazi' or exec == 'vim' or exec == 'nvim':
-                subprocess.Popen(["kitty", "-e", "sh", "-c", exec])
+                subprocess.Popen([term, "-e", "sh", "-c", exec])
             else:
                 cmd = shlex.split(exec)
                 subprocess.Popen(cmd, start_new_session = True, cwd = os.path.expanduser("~"))
 
     else:
         if exec =='htop' or exec == 'yazi' or exec == 'vim' or exec == 'nvim':
-            subprocess.Popen(["kitty", "-e", "sh", "-c", exec])
+            subprocess.Popen([term, "-e", "sh", "-c", exec])
         else:
             cmd = shlex.split(exec)
             subprocess.Popen(cmd, start_new_session = True, cwd = os.path.expanduser("~"))
