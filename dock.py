@@ -19,8 +19,8 @@ class Dock(Gtk.Window):
 
         self.layouts()
         self.setupUI()
-        show_media = config.getboolean('Appearance', 'ShowMedia')
-        if show_media:
+        self.show_media = config.getboolean('Appearance', 'ShowMedia')
+        if self.show_media:
             self.media_()
             GLib.timeout_add(300, update_media, self.media_label, self.media_image)
             GLib.timeout_add(100, update_pauseplay, self.play_pause)
@@ -93,7 +93,7 @@ class Dock(Gtk.Window):
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=5)
         vbox.set_halign(Gtk.Align.CENTER)
         
-        if show:
+        if show and self.show_media:
             vbox.pack_start(self.media_label, False, False, 0)
             vbox.pack_start(hbox, False, False, 0)
 

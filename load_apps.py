@@ -80,9 +80,7 @@ def open_app(widget, exec, name):
         # if name in check.stdout.strip() or check.stdout.strip() in name:
         check = check_names(name)
         if check:
-            print(name)
             list_apps_by_workspace(name)
-            print(workspace_apps.get(name))
             subprocess.Popen(['hyprctl', 'dispatch', 'workspace', f"{workspace_apps.get(name)}"])
 
 
@@ -132,7 +130,6 @@ def load(main_box):
             vbox.pack_start(dot_box, False, False, 0)
 
             button.add(vbox)
-            print(name)
             button.connect('clicked', open_app, exec_cmd, name)
             main_box.pack_start(button, False, False, 0)
             GLib.timeout_add(250, count_windows, name, dot_box, button)
