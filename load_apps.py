@@ -12,52 +12,50 @@ from load_css import load_css_
 from collections import defaultdict
 
 workspace_apps = {}
-
-# def list_apps_by_workspace():
-#     result = subprocess.run(["hyprctl", "-j", "clients"], capture_output=True, text=True)
-#     clients = json.loads(result.stdout)
-
-#     workspaces = defaultdict(list)
-#     for client in clients:
-#         workspace_id = client["workspace"]["id"]
-        
-#         app_name = client["initialTitle"]
-#         # print(app_name)
-#         workspaces[workspace_id].append(app_name)
-
-#     for ws_id in sorted(workspaces):
-#         for app in workspaces[ws_id]:
-#             # if app == 'Visual Studio Code':
-#             #     app = 'Code'
-#             workspace_apps[app] = ws_id
+workspace_apps_ = {}
 
 
-def list_apps_by_workspace(name):
+def test():
     result = subprocess.run(["hyprctl", "-j", "clients"], capture_output=True, text=True)
     clients = json.loads(result.stdout)
 
     workspaces = defaultdict(list)
     for client in clients:
         workspace_id = client["workspace"]["id"]
-        if client['class'] == name or name in client['class'] or client['class'] in name or client['initialTitle'] == name or client['initialTitle'] in name or name in client['initialTitle']:
-            # app_name = client["initialTitle"]
-        # print(app_name)
+        if client['class'].lower() != app_names and client['class'].lower() not in app_names and client['initialTitle'].lower() != app_names and client['initialTitle'].lower() not in app_names:
+            workspaces[workspace_id].append(client['initialClass'].lower())
+        else:
+            continue
+
+    for ws_id in sorted(workspaces):
+        for app in workspaces[ws_id]:
+            workspace_apps_[app] = ws_id
+    print(workspace_apps_)
+
+def list_apps_by_workspace(name):
+    name = name.lower()
+    result = subprocess.run(["hyprctl", "-j", "clients"], capture_output=True, text=True)
+    clients = json.loads(result.stdout)
+
+    workspaces = defaultdict(list)
+    for client in clients:
+        workspace_id = client["workspace"]["id"]
+        if client['class'].lower() == name or name in client['class'].lower() or client['class'].lower() in name or client['initialTitle'].lower() == name or client['initialTitle'].lower() in name or name in client['initialTitle'].lower():
             workspaces[workspace_id].append(name)
 
     for ws_id in sorted(workspaces):
         for app in workspaces[ws_id]:
-            # if app == 'Visual Studio Code':
-            #     app = 'Code'
             workspace_apps[app] = ws_id
 
 
 def check_names(name):
+    name = name.lower()
     result = subprocess.run(['hyprctl', 'clients', '-j'], stdout=subprocess.PIPE, text=True)
     clients = json.loads(result.stdout)
     # windows = [c for c in clients if c['class'] == name or name in c['class'] or c['class'] in name or c['initialTitle'] == name or c['initialTitle'] in name or name in c['initialTitle']]
 
     for c in clients:
-        if c['class'] == name or name in c['class'] or c['class'] in name or c['initialTitle'] == name or c['initialTitle'] in name or name in c['initialTitle']:
+        if c['class'].lower() == name or name in c['class'].lower() or c['class'].lower() in name or c['initialTitle'].lower() == name or c['initialTitle'].lower() in name or name in c['initialTitle'].lower():
             return True
     return False
 
@@ -69,17 +67,8 @@ def open_app(widget, exec, name):
     swicther = get_switcher()
     
     if swicther:
-        
-        # result = subprocess.run(['hyprctl', 'clients', '-j'], stdout=subprocess.PIPE, text=True)
-        # clients = json.loads(result.stdout)
-        # # windows = [c for c in clients if c['class'] == name or name in c['class'] or c['class'] in name or c['initialTitle'] == name or c['initialTitle'] in name or name in c['initialTitle']]
-
-        # for c in clients:
-        #     if c['class'] == name or name in c['class'] or c['class'] in name or c['initialTitle'] == name or c['initialTitle'] in name or name in c['initialTitle']:
-            
         term = config.get('Options', 'Terminal')
 
-        # if name in check.stdout.strip() or check.stdout.strip() in name:
         check = check_names(name)
         if check:
             list_apps_by_workspace(name)
@@ -124,13 +113,12 @@ def load(main_box):
             dot_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
             dot_box.set_halign(Gtk.Align.CENTER)
 
-
-            # if name == 'Visual Studio Code':
-            #     name = 'Code'
-            
             vbox.pack_start(image, False, False, 0)
             vbox.pack_start(dot_box, False, False, 0)
 
+            test()
+
+        
             button.add(vbox)
             button.connect('clicked', open_app, exec_cmd, name)
             main_box.pack_start(button, False, False, 0)
@@ -139,10 +127,10 @@ def load(main_box):
 
 
 def count_windows(app, dot_box, button):
+    app = app.lower()
     result = subprocess.run(['hyprctl', 'clients', '-j'], stdout=subprocess.PIPE, text=True)
     clients = json.loads(result.stdout)
-    windows = [c for c in clients if c['class'] == app or app in c['class'] or c['class'] in app or c['initialTitle'] == app or c['initialTitle'] in app or app in c['initialTitle']]
-    # windows = [c for c in clients if c['class'] == app and app in c['class'] or c['class'] in app]
+    windows = [c for c in clients if c['class'].lower() == app or app in c['class'].lower() or c['class'].lower() in app or c['initialTitle'].lower() == app or c['initialTitle'].lower() in app or app in c['initialTitle'].lower()]
 
     len_window = int(len(windows))
 

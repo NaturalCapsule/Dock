@@ -9,6 +9,7 @@ config.read('config/config.ini')
 
 # apps_info = {}
 apps_info = []
+app_names = []
 
 def clean_exec(exec_cmd):
     return re.sub(r"\s*%[a-zA-Z]", "", exec_cmd).strip()
@@ -36,7 +37,8 @@ def get_apps(Gtk):
                         print("Error: Invalid file type, The file need to be has these inside:\n[Desktop Entry]\nName=(Name of the application)\nExec=(Execute command)\nicon=(icon)\n\nPlease try again")
                     # apps_info[icon] = clean_exec_, name
                     if name and exec_command:
-                        apps_info.append((name, clean_exec_, icon))
+                        app_names.append(name.lower())
+                        apps_info.append((name.lower(), clean_exec_, icon))
                         # apps_info.append((icon, clean_exec_, name))
                     # print(apps_info)
             except ValueError:
