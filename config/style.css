@@ -131,3 +131,15 @@ button * {
     border-color: #f38ba8;
     color: #f38ba8;
 }
+
+tooltip {
+    color: white;
+    background-color: black;
+    margin: 10px;
+    padding: 10px;
+    border-radius: 22px;
+    border-width: 2px;
+    border-style: solid;
+    transition: all 0.2s ease;
+
+}

@@ -15,7 +15,7 @@ import cairo
 media = MediaPlayerMonitor()
 
 title_name, player_name = '', ''
-
+media_tool_tip = ''
 
 def create_radius_pixbuf(pixbuf):
     width, height = pixbuf.get_width(), pixbuf.get_height()
@@ -91,7 +91,9 @@ def update_media(label, image):
     if current_player:
         try:
             if should_update:
+                global media_tool_tip
                 print(f"title: {current_title}\nartist: {media.artist}")
+                media_tool_tip = f'Now Playing: {current_title}\n          By\n{media.artist}'
                 
                 current_title = str(current_title)
                 if len(current_title) >= 8:
@@ -99,10 +101,8 @@ def update_media(label, image):
                 
                 safe_set_label(label, current_title)
                 
-                # height, width = 90, 90
                 if 'file:///' in media.art_url:
                     thumbnail = media.art_url.replace('file:///', '/')
-                    # height, width = 90, 90
                 elif 'https://' in media.art_url or 'http://' in media.art_url:
                     thumbnail = get_cached_filename(current_title)
                     if not os.path.exists(thumbnail):
@@ -110,15 +110,17 @@ def update_media(label, image):
                         urllib.request.urlretrieve(media.art_url, thumbnail)
                     else:
                         print(f"Using cached thumbnail: {thumbnail}")
-                    # height, width = 55, 70
 
                 if thumbnail and os.path.exists(thumbnail):
                     x, y = thumbnail_size()
+                    # pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(thumbnail, 90, 70)
                     pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(thumbnail, x, y)
                     radius_pixbuf = create_radius_pixbuf(pixbuf)
 
                     print("Setting images safely...")
                     safe_set_image(image, radius_pixbuf)
+                    image.set_has_tooltip(True)
+                    image.connect("query-tooltip", media_tooltip)
                     image.show()
 
 
@@ -127,11 +129,16 @@ def update_media(label, image):
             print(f"Exception in update_image: {e}")
 
     else:
+        media_tool_tip = 'No Active media is playing!'
         safe_set_label(label, '')
         image.hide()
 
     return True
 
+def media_tooltip(widget, x, y, keyboard_mode, tooltip):
+    global media_tool_tip
+    tooltip.set_text(media_tool_tip)
+    return True
 
 # def update_media(title_label, image):
 #     global title_name, player_name

@@ -35,11 +35,9 @@ def get_apps(Gtk):
                         clean_exec_ = clean_exec(exec_command)
                     except configparser.NoSectionError:
                         print("Error: Invalid file type, The file need to be has these inside:\n[Desktop Entry]\nName=(Name of the application)\nExec=(Execute command)\nicon=(icon)\n\nPlease try again")
-                    # apps_info[icon] = clean_exec_, name
                     if name and exec_command:
                         app_names.append(name.lower())
                         apps_info.append((name.lower(), clean_exec_, icon))
-                        # apps_info.append((icon, clean_exec_, name))
                     # print(apps_info)
             except ValueError:
                 print(f"Invalid entry for {key} in config.ini. Expected format: app_path")

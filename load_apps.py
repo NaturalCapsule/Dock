@@ -18,6 +18,7 @@ workspace_apps_ = {}
 opened_apps = []
 
 
+
 desktop_dirs = [
     Path("/usr/share/applications")
 ]
@@ -70,7 +71,6 @@ def get_other_apps():
         for app in workspaces[ws_id]:
             workspace_apps_[app] = ws_id
 
-
 def list_apps_by_workspace(name):
     name = name.lower()
     result = subprocess.run(["hyprctl", "-j", "clients"], capture_output=True, text=True)
@@ -97,14 +97,14 @@ def check_names(name):
             return True
     return False
 
-def open_app(widget, exec, name):
+def open_app(widget, exec, name, use_changer):
     check = subprocess.run("hyprctl clients | grep -E 'workspace|class|initialTitle'", 
                            shell=True, capture_output=True, text=True)
     
     
     swicther = get_switcher()
     
-    if swicther:
+    if swicther and use_changer:
         term = config.get('Options', 'Terminal')
 
         check = check_names(name)
@@ -139,6 +139,7 @@ def load(main_box):
             button = Gtk.Button()
             button.set_size_request(48, 48)
             button.get_style_context().add_class('App-Button')
+            button.set_tooltip_text(name)
 
             vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
 
@@ -157,11 +158,9 @@ def load(main_box):
 
         
             button.add(vbox)
-            button.connect('clicked', open_app, exec_cmd, name)
+            button.connect('clicked', open_app, exec_cmd, name, True)
             main_box.pack_start(button, False, False, 0)
-            GLib.timeout_add(250, count_windows, name, dot_box, button)
-            # GLib.timeout_add(250, get_opened_app_info)
-
+            GLib.timeout_add(750, count_windows, name, dot_box, button)
 
 
 def count_windows(app, dot_box, button):
@@ -198,18 +197,19 @@ app_buttons = {}
 
 
 def is_app_match(client, app_name):
-    app_name = app_name.casefold()
+    app_name = app_name.casefold().lower()
     class_name = client.get('class', '').casefold()
     initial_class = client.get('initialClass', '').casefold()
     title = client.get('initialTitle', '').casefold()
-    
+
     if app_name == 'obs' or app_name == 'obs studio':
         return (
             'obs' in class_name or 
             'obs' in initial_class or
             'obs' in title
         )
-    
+
+
     elif app_name == 'rofi':
         return (
             client.get('class', '').casefold() == 'rofi' and
@@ -225,27 +225,12 @@ def is_app_match(client, app_name):
             title in app_name
         )
 
-    # return (
-    #     app_name == class_name or
-    #     app_name == class_name or
-    #     class_name == app_name or
-    #     app_name == title or
-    #     title == app_name
-    # )
-
-    # return (
-    #     app_name == class_name or
-    #     app_name in class_name or
-    #     app_name == initial_class or
-    #     app_name in initial_class or
-    #     app_name in title or
-    #     title in app_name
-    # )
 
 def create_button_for_app(name, exec_cmd, icon):
     button = Gtk.Button()
     button.set_size_request(48, 48)
     button.get_style_context().add_class('App-Button')
+    button.set_tooltip_text(name)
 
     x, y = dock_icons_sizes()
 
@@ -264,41 +249,10 @@ def create_button_for_app(name, exec_cmd, icon):
     vbox.pack_start(dot_box, False, False, 0)
 
     button.add(vbox)
-    button.connect('clicked', open_app, exec_cmd, name)
+    button.connect('clicked', open_app, exec_cmd, name, False)
 
     return button, dot_box
 
-# def count_other_apps(dot_box, app, button, main_box):
-#     app = app.casefold()
-#     result = subprocess.run(['hyprctl', 'clients', '-j'], stdout=subprocess.PIPE, text=True)
-#     clients = json.loads(result.stdout)
-#     windows = [c for c in clients if is_app_match(c, app)]
-#     len_window = len(windows)
-
-#     for child in dot_box.get_children():
-#         dot_box.remove(child)
-
-#     if len_window > 0:
-#         if not button.get_parent():
-#             main_box.pack_start(button, False, False, 0)
-#             button.show_all()
-
-#         button.get_style_context().remove_class('App-Button')
-#         button.get_style_context().add_class('Active-Apps')
-
-#         for _ in range(len_window):
-#             dot = Gtk.Label(label='')
-#             dot.set_size_request(1, 1)
-#             dot.get_style_context().add_class('Dot')
-#             dot_box.pack_start(dot, False, False, 0)
-
-#         dot_box.show_all()
-#     else:
-#         parent = button.get_parent()
-#         if parent:
-#             parent.remove(button)
-
-#     return True
 
 
 def count_other_apps(dot_box, app, button, main_box):
@@ -335,6 +289,12 @@ def count_other_apps(dot_box, app, button, main_box):
 
         dot_box.show_all()
     else:
+
+        if app.casefold() in ('obs', 'obs studio'):
+            return True
+        parent = button.get_parent()
+        if parent:
+            parent.remove(button)
 
         parent = button.get_parent()
         if parent:
@@ -383,16 +343,14 @@ def periodic_app_checker(main_box):
         app_class_ = client.get('initialClass', '').casefold()
 
         for name, exec_cmd, icon in get_opened_app_info():
-        
             name_cf = name.lower()
-            # if name_cf in app_class and name_cf in app_title and name_cf in app_class_ or app_class_ in name_cf:
             if name_cf in app_class or name_cf in app_title or name_cf in app_class_ or app_class_ in name_cf:
                 if name_cf not in app_buttons:
                     button, dot_box = create_button_for_app(name, exec_cmd, icon)
                     app_buttons[name_cf] = (button, dot_box)
                     main_box.pack_start(button, False, False, 0)
                     button.show_all()
-                    GLib.timeout_add(250, count_other_apps, dot_box, name, button, main_box)
+                    GLib.timeout_add(500, count_other_apps, dot_box, name, button, main_box)
                     break
 
     return True
@@ -409,6 +367,6 @@ def load_other_apps(main_box):
         app_buttons[name.lower()] = (button, dot_box)
         main_box.pack_start(button, False, False, 0)
         button.show_all()
-        GLib.timeout_add(250, count_other_apps, dot_box, name, button, main_box)
+        GLib.timeout_add(750, count_other_apps, dot_box, name, button, main_box)
 
-    GLib.timeout_add(1000, periodic_app_checker, main_box)
+    GLib.timeout_add(2000, periodic_app_checker, main_box)

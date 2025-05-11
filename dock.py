@@ -26,9 +26,7 @@ class Dock(Gtk.Window):
             GLib.timeout_add(100, update_pauseplay, self.play_pause)
 
         load(self.main_box)
-        # load_other_apps(self.main_box)
-        GLib.timeout_add_seconds(0.5, load_other_apps, self.main_box)
-        
+        load_other_apps(self.main_box)
         
         self.show_all()
 
