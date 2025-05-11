@@ -6,7 +6,7 @@ gi.require_version('GtkLayerShell', '0.1')
 from gi.repository import Gtk, Gdk, GtkLayerShell
 from config import *
 from layouts import LayOuts
-from load_apps import load
+from load_apps import *
 from load_css import load_css_
 from load_media import *
 from media import pause_play, backward, forward
@@ -24,7 +24,10 @@ class Dock(Gtk.Window):
             self.media_()
             GLib.timeout_add(300, update_media, self.media_label, self.media_image)
             GLib.timeout_add(100, update_pauseplay, self.play_pause)
+
         load(self.main_box)
+        # load_other_apps(self.main_box)
+        GLib.timeout_add_seconds(0.5, load_other_apps, self.main_box)
         
         
         self.show_all()

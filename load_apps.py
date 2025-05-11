@@ -10,27 +10,66 @@ from gi.repository import Gtk, GdkPixbuf, GLib
 from config import *
 from load_css import load_css_
 from collections import defaultdict
+from pathlib import Path
+from configparser import ConfigParser
 
 workspace_apps = {}
 workspace_apps_ = {}
+opened_apps = []
 
 
-def test():
+desktop_dirs = [
+    Path("/usr/share/applications")
+]
+
+def get_opened_app_info():
+    get_other_apps()
+    config_ = ConfigParser(interpolation=None)
+    for directory in desktop_dirs:
+        if not directory.exists():
+            continue
+        for file in directory.glob("*.desktop"):
+            config_.read(file, encoding="utf-8")
+            file = str(file).lower()
+            file = file.replace('/usr/share/applications/', '')
+            file = file.replace('.desktop', '')
+
+
+            if file in list(workspace_apps_.keys()):
+                try:
+                    name = config_.get("Desktop Entry", "Name")
+                    exec_cmd = config_.get("Desktop Entry", "Exec")
+                    icon = config_.get("Desktop Entry", "Icon")
+
+                    exec_cmd = clean_exec(exec_cmd)
+                    if name and exec_cmd:
+                        opened_apps.append((name, exec_cmd, icon))
+                except Exception as e:
+                    print(f"Error reading {file}: {e}")
+    return opened_apps
+
+
+def get_other_apps():
+    global workspace_apps_
+    workspace_apps_.clear()
+
     result = subprocess.run(["hyprctl", "-j", "clients"], capture_output=True, text=True)
     clients = json.loads(result.stdout)
 
     workspaces = defaultdict(list)
+
     for client in clients:
         workspace_id = client["workspace"]["id"]
-        if client['class'].lower() != app_names and client['class'].lower() not in app_names and client['initialTitle'].lower() != app_names and client['initialTitle'].lower() not in app_names:
-            workspaces[workspace_id].append(client['initialClass'].lower())
-        else:
-            continue
+        client_class = client['class'].lower()
+        client_title = client['initialTitle'].lower()
+
+        if client_class not in app_names and client_title not in app_names:
+            workspaces[workspace_id].append(client_class)
 
     for ws_id in sorted(workspaces):
         for app in workspaces[ws_id]:
             workspace_apps_[app] = ws_id
-    print(workspace_apps_)
+
 
 def list_apps_by_workspace(name):
     name = name.lower()
@@ -52,7 +91,6 @@ def check_names(name):
     name = name.lower()
     result = subprocess.run(['hyprctl', 'clients', '-j'], stdout=subprocess.PIPE, text=True)
     clients = json.loads(result.stdout)
-    # windows = [c for c in clients if c['class'] == name or name in c['class'] or c['class'] in name or c['initialTitle'] == name or c['initialTitle'] in name or name in c['initialTitle']]
 
     for c in clients:
         if c['class'].lower() == name or name in c['class'].lower() or c['class'].lower() in name or c['initialTitle'].lower() == name or c['initialTitle'].lower() in name or name in c['initialTitle'].lower():
@@ -116,13 +154,13 @@ def load(main_box):
             vbox.pack_start(image, False, False, 0)
             vbox.pack_start(dot_box, False, False, 0)
 
-            test()
 
         
             button.add(vbox)
             button.connect('clicked', open_app, exec_cmd, name)
             main_box.pack_start(button, False, False, 0)
             GLib.timeout_add(250, count_windows, name, dot_box, button)
+            # GLib.timeout_add(250, get_opened_app_info)
 
 
 
@@ -154,3 +192,223 @@ def count_windows(app, dot_box, button):
         button.get_style_context().add_class('App-Button')
 
     return True
+
+shown_apps = set()
+app_buttons = {}
+
+
+def is_app_match(client, app_name):
+    app_name = app_name.casefold()
+    class_name = client.get('class', '').casefold()
+    initial_class = client.get('initialClass', '').casefold()
+    title = client.get('initialTitle', '').casefold()
+    
+    if app_name == 'obs' or app_name == 'obs studio':
+        return (
+            'obs' in class_name or 
+            'obs' in initial_class or
+            'obs' in title
+        )
+    
+    elif app_name == 'rofi':
+        return (
+            client.get('class', '').casefold() == 'rofi' and
+            client.get('initialClass', '').casefold() == 'rofi'
+        )
+    else:
+    
+        return (
+            app_name == class_name or
+            app_name in class_name or
+            class_name in app_name or
+            app_name in title or
+            title in app_name
+        )
+
+    # return (
+    #     app_name == class_name or
+    #     app_name == class_name or
+    #     class_name == app_name or
+    #     app_name == title or
+    #     title == app_name
+    # )
+
+    # return (
+    #     app_name == class_name or
+    #     app_name in class_name or
+    #     app_name == initial_class or
+    #     app_name in initial_class or
+    #     app_name in title or
+    #     title in app_name
+    # )
+
+def create_button_for_app(name, exec_cmd, icon):
+    button = Gtk.Button()
+    button.set_size_request(48, 48)
+    button.get_style_context().add_class('App-Button')
+
+    x, y = dock_icons_sizes()
+
+    vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+    try:
+        pixbuf = Gtk.IconTheme.get_default().load_icon(icon, 32, 0)
+        scaled_pixbuf = pixbuf.scale_simple(x, y, GdkPixbuf.InterpType.BILINEAR)
+        image = Gtk.Image.new_from_pixbuf(scaled_pixbuf)
+    except GLib.GError:
+        image = Gtk.Image.new_from_icon_name('application-x-executable', Gtk.IconSize.DIALOG)
+
+    dot_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
+    dot_box.set_halign(Gtk.Align.CENTER)
+
+    vbox.pack_start(image, False, False, 0)
+    vbox.pack_start(dot_box, False, False, 0)
+
+    button.add(vbox)
+    button.connect('clicked', open_app, exec_cmd, name)
+
+    return button, dot_box
+
+# def count_other_apps(dot_box, app, button, main_box):
+#     app = app.casefold()
+#     result = subprocess.run(['hyprctl', 'clients', '-j'], stdout=subprocess.PIPE, text=True)
+#     clients = json.loads(result.stdout)
+#     windows = [c for c in clients if is_app_match(c, app)]
+#     len_window = len(windows)
+
+#     for child in dot_box.get_children():
+#         dot_box.remove(child)
+
+#     if len_window > 0:
+#         if not button.get_parent():
+#             main_box.pack_start(button, False, False, 0)
+#             button.show_all()
+
+#         button.get_style_context().remove_class('App-Button')
+#         button.get_style_context().add_class('Active-Apps')
+
+#         for _ in range(len_window):
+#             dot = Gtk.Label(label='')
+#             dot.set_size_request(1, 1)
+#             dot.get_style_context().add_class('Dot')
+#             dot_box.pack_start(dot, False, False, 0)
+
+#         dot_box.show_all()
+#     else:
+#         parent = button.get_parent()
+#         if parent:
+#             parent.remove(button)
+
+#     return True
+
+
+def count_other_apps(dot_box, app, button, main_box):
+    app = app.casefold()
+    result = subprocess.run(['hyprctl', 'clients', '-j'], stdout=subprocess.PIPE, text=True)
+    clients = json.loads(result.stdout)
+
+    seen_addresses = set()
+    windows = []
+
+    for c in clients:
+        if is_app_match(c, app) and c['address'] not in seen_addresses:
+            seen_addresses.add(c['address'])
+            windows.append(c)
+
+    len_window = len(windows)
+
+    for child in dot_box.get_children():
+        dot_box.remove(child)
+
+    if len_window > 0:
+        if not button.get_parent():
+            main_box.pack_start(button, False, False, 0)
+            button.show_all()
+
+        button.get_style_context().remove_class('App-Button')
+        button.get_style_context().add_class('Active-Apps')
+        
+        for _ in range(len_window):
+            dot = Gtk.Label(label='')
+            dot.set_size_request(1, 1)
+            dot.get_style_context().add_class('Dot')
+            dot_box.pack_start(dot, False, False, 0)
+
+        dot_box.show_all()
+    else:
+
+        parent = button.get_parent()
+        if parent:
+            parent.remove(button)
+
+    return True
+
+
+
+def count_windows(app, dot_box, button):
+    app = app.casefold()
+    result = subprocess.run(['hyprctl', 'clients', '-j'], stdout=subprocess.PIPE, text=True)
+    clients = json.loads(result.stdout)
+    windows = [c for c in clients if is_app_match(c, app)]
+    len_window = len(windows)
+
+    for child in dot_box.get_children():
+        dot_box.remove(child)
+
+    if len_window > 0:
+        button.get_style_context().remove_class('App-Button')
+        button.get_style_context().add_class('Active-Apps')
+
+        for _ in range(len_window):
+            dot = Gtk.Label(label='')
+            dot.set_size_request(1, 1)
+            dot.get_style_context().add_class('Dot')
+            dot_box.pack_start(dot, False, False, 0)
+
+        dot_box.show_all()
+    else:
+        button.get_style_context().remove_class('Active-Apps')
+        button.get_style_context().add_class('App-Button')
+
+    return True
+
+def periodic_app_checker(main_box):
+    global shown_apps, app_buttons
+
+    result = subprocess.run(['hyprctl', 'clients', '-j'], stdout=subprocess.PIPE, text=True)
+    clients = json.loads(result.stdout)
+
+    for client in clients:
+        app_class = client.get('class', '').casefold()
+        app_title = client.get('initialTitle', '').casefold()
+        app_class_ = client.get('initialClass', '').casefold()
+
+        for name, exec_cmd, icon in get_opened_app_info():
+        
+            name_cf = name.lower()
+            # if name_cf in app_class and name_cf in app_title and name_cf in app_class_ or app_class_ in name_cf:
+            if name_cf in app_class or name_cf in app_title or name_cf in app_class_ or app_class_ in name_cf:
+                if name_cf not in app_buttons:
+                    button, dot_box = create_button_for_app(name, exec_cmd, icon)
+                    app_buttons[name_cf] = (button, dot_box)
+                    main_box.pack_start(button, False, False, 0)
+                    button.show_all()
+                    GLib.timeout_add(250, count_other_apps, dot_box, name, button, main_box)
+                    break
+
+    return True
+
+def load_other_apps(main_box):
+    load_css_()
+    
+    app = get_opened_app_info()
+    for name, exec_cmd, icon in app:
+        if name.lower() in app_buttons:
+            continue
+
+        button, dot_box = create_button_for_app(name, exec_cmd, icon)
+        app_buttons[name.lower()] = (button, dot_box)
+        main_box.pack_start(button, False, False, 0)
+        button.show_all()
+        GLib.timeout_add(250, count_other_apps, dot_box, name, button, main_box)
+
+    GLib.timeout_add(1000, periodic_app_checker, main_box)
