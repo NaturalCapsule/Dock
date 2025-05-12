@@ -1,9 +1,36 @@
 import gi
-gi.require_version('Gtk', '3.0')
-gi.require_version('Gdk', '3.0')
-gi.require_version('GtkLayerShell', '0.1')
+import os
+import shutil
 
-from gi.repository import Gtk, Gdk, GtkLayerShell
+# username = os.getlogin()
+# current_dir = os.path.dirname(os.path.abspath(__file__))
+
+# folder_name = 'config'
+
+# folder_path = os.path.join(current_dir, folder_name)
+
+# if os.path.isdir(folder_path) and not os.path.exists(f'/home/{username}/.config/DockWaver'):
+#     print("checking......")
+#     os.makedirs(f'/home/{username}/.config/DockWaver')
+#     dst = f'/home/{username}/.config/DockWaver/'
+#     src = 'config'
+#     print("moving.....")
+#     shutil.move(src, dst)
+#     print(f"'config' folder moved to /home/{username}/.config/DockWaver/, successfully!")
+#     print(f"[Warning!]: If you don't see the folder in /home/{username}/.config/DockWaver, Please move the 'config' folder manually to -> /home/{username}/.config/DockWaver")
+
+
+try:
+    gi.require_version('Gtk', '3.0')
+    gi.require_version('Gdk', '3.0')
+    gi.require_version('GtkLayerShell', '0.1')
+except ValueError:
+    print("Make sure GTK and GtkLayerShell are installed on your python env")
+
+try:
+    from gi.repository import Gtk, Gdk, GtkLayerShell
+except ImportError:
+    print("Make sure GTK and GtkLayerShell are installed on your python env")
 from config import *
 from layouts import LayOuts
 from load_apps import *
@@ -26,7 +53,8 @@ class Dock(Gtk.Window):
             GLib.timeout_add(100, update_pauseplay, self.play_pause)
 
         load(self.main_box)
-        load_other_apps(self.main_box)
+        if get_others():
+            load_other_apps(self.main_box)
         
         self.show_all()
 

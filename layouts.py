@@ -1,11 +1,13 @@
 import gi
 import os
-gi.require_version('Gtk', '3.0')
-gi.require_version("GtkLayerShell", "0.1")
+try:
+    gi.require_version('Gtk', '3.0')
+    gi.require_version("GtkLayerShell", "0.1")
 
-from gi.repository import Gtk, GtkLayerShell
-
-
+    from gi.repository import Gtk, GtkLayerShell
+except (ValueError, ImportError):
+    print("Make sure GTK and GtkLayerShell are installed on your python env")
+    
 class LayOuts:
     def __init__(self, parent):
         

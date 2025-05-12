@@ -1,14 +1,13 @@
 import gi
+import os
 gi.require_version('Gtk', '3.0')
 gi.require_version('Gdk', '3.0')
-# gi.require_version('Gtk', '3.0')
-# gi.require_version('Gdk', '3.0')
 from gi.repository import Gtk, Gdk
 
 
 def load_css_():
     css_provider = Gtk.CssProvider()
-    with open ('config/style.css', 'r') as f:
+    with open (f'/home/{os.getlogin()}/.config/DockWaver/config/style.css', 'r') as f:
         css = f.read()
     css_provider.load_from_data(css.encode())
 

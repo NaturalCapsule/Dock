@@ -1,13 +1,12 @@
 import re
+import os
 import configparser
-# from configparser import ConfigParser
 
 
 config = configparser.ConfigParser()
 
-config.read('config/config.ini')
+config.read(f'/home/{os.getlogin()}/.config/DockWaver/config/config.ini')
 
-# apps_info = {}
 apps_info = []
 app_names = []
 
@@ -95,3 +94,10 @@ def thumbnail_size():
     except Exception as e:
         print('Make sure you set a correct value in IconSize')
         return 20, 20
+
+def get_others():
+    try:
+        others = config.getboolean('Options', 'ShowOpenedApps')
+        return others
+    except ValueError:
+        return False
