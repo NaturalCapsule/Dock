@@ -22,18 +22,6 @@ Features
   - config/config.ini – For behavior and layout settings
   - config/style.css – For visual styling
 
-Folder Structure
-----------------
-
-DockWaver/
-├── config/
-│   ├── config.ini     # Configuration for dock settings
-│   └── style.css      # CSS styling for the dock
-├── dock.py            # Entry point of DockWaver
-├── README.md
-└── ...
-
----
 
 ## 🛠️ Built With
 
