@@ -131,33 +131,42 @@ def open_app(widget, exec, name, use_changer):
 def load(main_box):
     load_css_()
     
+    x, y = dock_icons_sizes()
+    
     app = get_apps(Gtk)
     for name, exec_cmd, icon in app:
-        if name == 'Separator' and icon == None:
+        if name == 'Separator' and icon is None:
             main_box.pack_start(exec_cmd, False, False, 0)
         else:
             button = Gtk.Button()
-            button.set_size_request(48, 48)
             button.get_style_context().add_class('App-Button')
             button.set_tooltip_text(name)
 
-            vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+            outer_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+            outer_box.set_vexpand(True)
+            outer_box.set_valign(Gtk.Align.FILL)
 
-            pixbuf = Gtk.IconTheme.get_default().load_icon(icon, 32, 0)
-            x, y = dock_icons_sizes()
-            scaled_pixbuf = pixbuf.scale_simple(x, y, GdkPixbuf.InterpType.BILINEAR)
-            image = Gtk.Image.new_from_pixbuf(scaled_pixbuf)
+            image_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+            image_box.set_valign(Gtk.Align.CENTER)
+            image_box.set_halign(Gtk.Align.CENTER)
 
+            try:
+                pixbuf = Gtk.IconTheme.get_default().load_icon(icon, 32, 0)
+                scaled_pixbuf = pixbuf.scale_simple(x, y, GdkPixbuf.InterpType.BILINEAR)
+                image = Gtk.Image.new_from_pixbuf(scaled_pixbuf)
+            except GLib.GError:
+                image = Gtk.Image.new_from_icon_name('application-x-executable', Gtk.IconSize.DIALOG)
+            image_box.pack_start(image, True, True, 0)
 
-            dot_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
+            dot_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
             dot_box.set_halign(Gtk.Align.CENTER)
+            dot_box.set_valign(Gtk.Align.END)
 
-            vbox.pack_start(image, False, False, 0)
-            vbox.pack_start(dot_box, False, False, 0)
+            outer_box.pack_start(image_box, True, True, 0)
+            outer_box.pack_end(dot_box, False, False, 0)
 
+            button.add(outer_box)
 
-        
-            button.add(vbox)
             button.connect('clicked', open_app, exec_cmd, name, True)
             main_box.pack_start(button, False, False, 0)
             GLib.timeout_add(750, count_windows, name, dot_box, button)
@@ -181,9 +190,12 @@ def count_windows(app, dot_box, button):
 
         for count in range(len_window):
             dot = Gtk.Label(label='')
-            dot.set_size_request(1, 1)
+            dot.set_halign(Gtk.Align.CENTER)
+            dot.set_valign(Gtk.Align.CENTER)
             dot.get_style_context().add_class('Dot')
+
             dot_box.pack_start(dot, False, False, 0)
+
 
         dot_box.show_all()
     else:
@@ -226,15 +238,43 @@ def is_app_match(client, app_name):
         )
 
 
+# def create_button_for_app(name, exec_cmd, icon):
+#     button = Gtk.Button()
+#     button.set_size_request(48, 48)
+#     button.get_style_context().add_class('App-Button')
+#     button.set_tooltip_text(name)
+
+#     x, y = dock_icons_sizes()
+
+#     vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+#     try:
+#         pixbuf = Gtk.IconTheme.get_default().load_icon(icon, 32, 0)
+#         scaled_pixbuf = pixbuf.scale_simple(x, y, GdkPixbuf.InterpType.BILINEAR)
+#         image = Gtk.Image.new_from_pixbuf(scaled_pixbuf)
+#     except GLib.GError:
+#         image = Gtk.Image.new_from_icon_name('application-x-executable', Gtk.IconSize.DIALOG)
+
+#     dot_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
+#     dot_box.set_halign(Gtk.Align.CENTER)
+
+#     vbox.pack_start(image, False, False, 0)
+#     vbox.pack_start(dot_box, False, False, 0)
+
+#     button.add(vbox)
+#     button.connect('clicked', open_app, exec_cmd, name, False)
+
+#     return button, dot_box
+
 def create_button_for_app(name, exec_cmd, icon):
     button = Gtk.Button()
-    button.set_size_request(48, 48)
+    # button.set_size_request(48, 48)
     button.get_style_context().add_class('App-Button')
     button.set_tooltip_text(name)
 
     x, y = dock_icons_sizes()
 
     vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+
     try:
         pixbuf = Gtk.IconTheme.get_default().load_icon(icon, 32, 0)
         scaled_pixbuf = pixbuf.scale_simple(x, y, GdkPixbuf.InterpType.BILINEAR)
@@ -244,6 +284,9 @@ def create_button_for_app(name, exec_cmd, icon):
 
     dot_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
     dot_box.set_halign(Gtk.Align.CENTER)
+    dot_box.set_valign(Gtk.Align.END)
+    dot_box.set_hexpand(False)
+    dot_box.set_vexpand(False)
 
     vbox.pack_start(image, False, False, 0)
     vbox.pack_start(dot_box, False, False, 0)
@@ -252,7 +295,6 @@ def create_button_for_app(name, exec_cmd, icon):
     button.connect('clicked', open_app, exec_cmd, name, False)
 
     return button, dot_box
-
 
 
 def count_other_apps(dot_box, app, button, main_box):

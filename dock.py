@@ -90,6 +90,10 @@ class Dock(Gtk.Window):
 
         self.add(self.main_box)
 
+    def apps_(self):
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+
+
     def media_(self):
         self.media_label = Gtk.Label()
         self.media_label.get_style_context().add_class('Video-Title')
