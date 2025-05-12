@@ -52,7 +52,7 @@ and
 
 2. **Goto directory**
    ```bash
-   cd dock
+   cd DockWaver
    ```
 
 3. **Launch**
