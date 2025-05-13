@@ -41,12 +41,12 @@ button * {
 /*--------------------------Don't Change Above!--------------------------*/
 
 .Dock {
-    background-color: transparent;
+    background-color: black;
     border-radius: 20px;
 }
 
 .Separators {
-    background-color: #6c7086; /* subdued separator */
+    background-color: white; /* subdued separator */
     border-radius: 1px;
     min-width: 2px;
     margin-top: 10px;
@@ -54,8 +54,8 @@ button * {
     min-height: 30px;
 }
 
-.Dot {
-    color: #cba6f7; /* lavender accent */
+.Trackers {
+    color: white; /* lavender accent */
     font-size: 8px;
     transition: all 0.2s ease;
     
@@ -63,31 +63,26 @@ button * {
 
 .Play-Pause {
     background-color: transparent;
-    color: #cba6f7;
-    border: 1px solid #cba6f7;
-    border-radius: 8px;
+    color: white;
 }
 
 .Forward {
     background-color: transparent;
-    color: #89b4fa;
-    border: 1px solid #89b4fa;
-    border-radius: 8px;
+    color: white;
 }
 
 .Backward {
     background-color: transparent;
-    color: #f38ba8;
-    border: 1px solid #f38ba8;
-    border-radius: 8px;
+    color: white;
 }
 
 .Video-Title {
-    margin-right: 10px;
-    margin-left: 10px;
-    color: #cdd6f4; /* readable text color */
+    color: #cdd6f4;
     font-weight: bold;
     font-size: 14px;
+    margin-top: 15px;
+    margin-left: 15px;
+    margin-right: 15px;
 }
 
 .Thumnbail {
@@ -95,42 +90,36 @@ button * {
 }
 
 .Active-Apps {
-    background-color: #1e1e2e;
-    border: 2px solid #cba6f7;
+    background-color: purple;
     border-radius: 12px;
-    padding: 6px;
-    margin: 4px;
-    box-shadow: inset 0 0 5px #6c7086;
+    padding: 4px;
+    margin-top: 2px;
 }
 
 .Active-Apps:hover {
-    background-color: #302d41;
+    background-color: black;
     transition: all 0.2s ease;
 
 }
 
 .App-Button {
     background-color: transparent;
-    border: 2px solid #cba6f7;
     border-radius: 12px;
-    padding: 6px;
-    margin: 4px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin: 10px;
     font-weight: bold;
     transition: all 0.2s ease;
 }
 
 .App-Button:hover {
-    background-color: #1e1e2e;
-    border-color: #89b4fa;
-    color: #89b4fa;
-    padding: 6px;
-    margin: 4px;
+    background-color: white;
+    padding: 4px;
+    margin-top: 2px;
 }
 
 .App-Button:active {
-    background-color: #1a1826;
-    border-color: #f38ba8;
-    color: #f38ba8;
+    background-color: white;
 }
 
 tooltip {

@@ -138,13 +138,17 @@ def load(main_box):
         if name == 'Separator' and icon is None:
             main_box.pack_start(exec_cmd, False, False, 0)
         else:
-            button = Gtk.Button()
-            button.get_style_context().add_class('App-Button')
-            button.set_tooltip_text(name)
+            app_container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+            app_container.set_valign(Gtk.Align.FILL)
+            app_container.set_halign(Gtk.Align.CENTER)
 
-            outer_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-            outer_box.set_vexpand(True)
-            outer_box.set_valign(Gtk.Align.FILL)
+            dot_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+            dot_box.set_halign(Gtk.Align.CENTER)
+            dot_box.set_valign(Gtk.Align.CENTER)
+            app_container.pack_end(dot_box, False, False, 0)
+
+            button = Gtk.Button()
+            button.set_tooltip_text(name)
 
             image_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
             image_box.set_valign(Gtk.Align.CENTER)
@@ -156,21 +160,16 @@ def load(main_box):
                 image = Gtk.Image.new_from_pixbuf(scaled_pixbuf)
             except GLib.GError:
                 image = Gtk.Image.new_from_icon_name('application-x-executable', Gtk.IconSize.DIALOG)
+
             image_box.pack_start(image, True, True, 0)
-
-            dot_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-            dot_box.set_halign(Gtk.Align.CENTER)
-            dot_box.set_valign(Gtk.Align.END)
-
-            outer_box.pack_start(image_box, True, True, 0)
-            outer_box.pack_end(dot_box, False, False, 0)
-
-            button.add(outer_box)
+            button.add(image_box)
 
             button.connect('clicked', open_app, exec_cmd, name, True)
-            main_box.pack_start(button, False, False, 0)
-            GLib.timeout_add(750, count_windows, name, dot_box, button)
 
+            app_container.pack_start(button, True, True, 0)
+            main_box.pack_start(app_container, False, False, 0)
+
+            GLib.timeout_add(250, count_windows, name, dot_box, button)
 
 def count_windows(app, dot_box, button):
     app = app.lower()
@@ -192,7 +191,7 @@ def count_windows(app, dot_box, button):
             dot = Gtk.Label(label='')
             dot.set_halign(Gtk.Align.CENTER)
             dot.set_valign(Gtk.Align.CENTER)
-            dot.get_style_context().add_class('Dot')
+            dot.get_style_context().add_class('Trackers')
 
             dot_box.pack_start(dot, False, False, 0)
 
@@ -238,42 +237,25 @@ def is_app_match(client, app_name):
         )
 
 
-# def create_button_for_app(name, exec_cmd, icon):
-#     button = Gtk.Button()
-#     button.set_size_request(48, 48)
-#     button.get_style_context().add_class('App-Button')
-#     button.set_tooltip_text(name)
-
-#     x, y = dock_icons_sizes()
-
-#     vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
-#     try:
-#         pixbuf = Gtk.IconTheme.get_default().load_icon(icon, 32, 0)
-#         scaled_pixbuf = pixbuf.scale_simple(x, y, GdkPixbuf.InterpType.BILINEAR)
-#         image = Gtk.Image.new_from_pixbuf(scaled_pixbuf)
-#     except GLib.GError:
-#         image = Gtk.Image.new_from_icon_name('application-x-executable', Gtk.IconSize.DIALOG)
-
-#     dot_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
-#     dot_box.set_halign(Gtk.Align.CENTER)
-
-#     vbox.pack_start(image, False, False, 0)
-#     vbox.pack_start(dot_box, False, False, 0)
-
-#     button.add(vbox)
-#     button.connect('clicked', open_app, exec_cmd, name, False)
-
-#     return button, dot_box
-
 def create_button_for_app(name, exec_cmd, icon):
-    button = Gtk.Button()
-    # button.set_size_request(48, 48)
-    button.get_style_context().add_class('App-Button')
-    button.set_tooltip_text(name)
-
     x, y = dock_icons_sizes()
 
-    vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+    app_container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+    app_container.set_valign(Gtk.Align.FILL)
+    app_container.set_halign(Gtk.Align.CENTER)
+    
+    dot_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
+    dot_box.set_valign(Gtk.Align.END)
+    dot_box.set_halign(Gtk.Align.CENTER)
+    app_container.pack_end(dot_box, True, True, 0)
+    
+    button = Gtk.Button()
+    button.get_style_context().add_class('Active-Apps')
+    button.set_tooltip_text(name)
+
+    image_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+    image_box.set_valign(Gtk.Align.CENTER)
+    image_box.set_halign(Gtk.Align.CENTER)
 
     try:
         pixbuf = Gtk.IconTheme.get_default().load_icon(icon, 32, 0)
@@ -282,19 +264,21 @@ def create_button_for_app(name, exec_cmd, icon):
     except GLib.GError:
         image = Gtk.Image.new_from_icon_name('application-x-executable', Gtk.IconSize.DIALOG)
 
-    dot_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
-    dot_box.set_halign(Gtk.Align.CENTER)
-    dot_box.set_valign(Gtk.Align.END)
-    dot_box.set_hexpand(False)
-    dot_box.set_vexpand(False)
+    image.set_valign(Gtk.Align.CENTER)
+    image.set_halign(Gtk.Align.CENTER)
 
-    vbox.pack_start(image, False, False, 0)
-    vbox.pack_start(dot_box, False, False, 0)
 
-    button.add(vbox)
+
+
+    image_box.pack_start(image, True, True, 0)
+
+    button.add(image_box)
     button.connect('clicked', open_app, exec_cmd, name, False)
 
-    return button, dot_box
+    app_container.pack_start(button, False, False, 0)
+
+
+    return app_container, dot_box
 
 
 def count_other_apps(dot_box, app, button, main_box):
@@ -325,18 +309,15 @@ def count_other_apps(dot_box, app, button, main_box):
         
         for _ in range(len_window):
             dot = Gtk.Label(label='')
-            dot.set_size_request(1, 1)
-            dot.get_style_context().add_class('Dot')
+            dot.set_halign(Gtk.Align.CENTER)
+            dot.set_valign(Gtk.Align.CENTER)
+            dot.get_style_context().add_class('Trackers')
             dot_box.pack_start(dot, False, False, 0)
 
         dot_box.show_all()
     else:
-
-        if app.casefold() in ('obs', 'obs studio'):
-            return True
-        parent = button.get_parent()
-        if parent:
-            parent.remove(button)
+        button.get_style_context().remove_class('Active-Apps')
+        button.get_style_context().add_class('App-Button')
 
         parent = button.get_parent()
         if parent:
@@ -362,14 +343,20 @@ def count_windows(app, dot_box, button):
 
         for _ in range(len_window):
             dot = Gtk.Label(label='')
-            dot.set_size_request(1, 1)
-            dot.get_style_context().add_class('Dot')
+            # dot.set_size_request(1, 1)
+            dot.set_halign(Gtk.Align.CENTER)
+            dot.set_valign(Gtk.Align.CENTER)
+            dot.get_style_context().add_class('Trackers')
             dot_box.pack_start(dot, False, False, 0)
 
         dot_box.show_all()
     else:
         button.get_style_context().remove_class('Active-Apps')
         button.get_style_context().add_class('App-Button')
+
+        # parent = button.get_parent()
+        # if parent:
+        #     parent.remove(button)
 
     return True
 
@@ -388,27 +375,27 @@ def periodic_app_checker(main_box):
             name_cf = name.lower()
             if name_cf in app_class or name_cf in app_title or name_cf in app_class_ or app_class_ in name_cf:
                 if name_cf not in app_buttons:
-                    button, dot_box = create_button_for_app(name, exec_cmd, icon)
-                    app_buttons[name_cf] = (button, dot_box)
-                    main_box.pack_start(button, False, False, 0)
-                    button.show_all()
-                    GLib.timeout_add(500, count_other_apps, dot_box, name, button, main_box)
+                    container, dot_box = create_button_for_app(name, exec_cmd, icon)
+                    app_buttons[name_cf] = (container, dot_box)
+                    main_box.pack_start(container, False, False, 0)
+                    container.show_all()
+                    GLib.timeout_add(500, count_other_apps, dot_box, name, container, main_box)
                     break
 
     return True
 
 def load_other_apps(main_box):
     load_css_()
-    
+
     app = get_opened_app_info()
     for name, exec_cmd, icon in app:
         if name.lower() in app_buttons:
             continue
 
-        button, dot_box = create_button_for_app(name, exec_cmd, icon)
-        app_buttons[name.lower()] = (button, dot_box)
-        main_box.pack_start(button, False, False, 0)
-        button.show_all()
-        GLib.timeout_add(750, count_other_apps, dot_box, name, button, main_box)
+        container, dot_box = create_button_for_app(name, exec_cmd, icon)
+        app_buttons[name.lower()] = (container, dot_box)
+        main_box.pack_start(container, False, False, 0)
+        container.show_all()
+        GLib.timeout_add(750, count_other_apps, dot_box, name, container, main_box)
 
     GLib.timeout_add(2000, periodic_app_checker, main_box)

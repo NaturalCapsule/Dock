@@ -33,7 +33,8 @@ def get_apps(Gtk):
                         
                         clean_exec_ = clean_exec(exec_command)
                     except configparser.NoSectionError:
-                        print("Error: Invalid file type, The file need to be has these inside:\n[Desktop Entry]\nName=(Name of the application)\nExec=(Execute command)\nicon=(icon)\n\nPlease try again")
+                        print("Error:File not found or Invalid file type, The file need to be has these inside:\n[Desktop Entry]\nName=(Name of the application)\nExec=(Execute command)\nicon=(icon)\n\nPlease check .config/DockWaver/config/config.ini")
+                        exit(0)
                     if name and exec_command:
                         app_names.append(name.lower())
                         apps_info.append((name.lower(), clean_exec_, icon))

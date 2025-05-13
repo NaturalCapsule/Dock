@@ -2,22 +2,23 @@ import gi
 import os
 import shutil
 
-# username = os.getlogin()
-# current_dir = os.path.dirname(os.path.abspath(__file__))
+username = os.getlogin()
+current_dir = os.path.dirname(os.path.abspath(__file__))
 
-# folder_name = 'config'
+folder_name = 'config'
 
-# folder_path = os.path.join(current_dir, folder_name)
+folder_path = os.path.join(current_dir, folder_name)
 
-# if os.path.isdir(folder_path) and not os.path.exists(f'/home/{username}/.config/DockWaver'):
-#     print("checking......")
-#     os.makedirs(f'/home/{username}/.config/DockWaver')
-#     dst = f'/home/{username}/.config/DockWaver/'
-#     src = 'config'
-#     print("moving.....")
-#     shutil.move(src, dst)
-#     print(f"'config' folder moved to /home/{username}/.config/DockWaver/, successfully!")
-#     print(f"[Warning!]: If you don't see the folder in /home/{username}/.config/DockWaver, Please move the 'config' folder manually to -> /home/{username}/.config/DockWaver")
+if os.path.isdir(folder_path) and not os.path.exists(f'/home/{username}/.config/DockWaver'):
+    print("checking......")
+    shutil.rmtree(f'/home/{username}/.config/DockWaver')
+    os.makedirs(f'/home/{username}/.config/DockWaver')
+    dst = f'/home/{username}/.config/DockWaver/'
+    src = 'config'
+    print("moving.....")
+    shutil.move(src, dst)
+    print(f"'config' folder moved to /home/{username}/.config/DockWaver/, successfully!")
+    print(f"[Warning!]: If you don't see the folder in /home/{username}/.config/DockWaver, Please move the 'config' folder manually to -> /home/{username}/.config/DockWaver")
 
 
 try:
@@ -89,10 +90,6 @@ class Dock(Gtk.Window):
             self.main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 
         self.add(self.main_box)
-
-    def apps_(self):
-        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
-
 
     def media_(self):
         self.media_label = Gtk.Label()
