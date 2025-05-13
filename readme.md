@@ -56,6 +56,11 @@ and
    ```
 
 3. **Launch**
+
    Warning!: When you run dock.py the `config` folder should be moved to `.config/` if not, move it manually
+
    ```bash
    GDK_BACKEND=wayland python dock.py
+  ```
+
+## If you cloning it again remove the DockWaver folder in `.config` folder and run the dock
